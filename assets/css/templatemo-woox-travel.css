@@ -819,19 +819,19 @@ Banner Style
 }
 #section-1 .content-slider .slider #top-banner-1 {
   background: url('../images/supply-chain-900x563.jpg') no-repeat center center;
-  background-size: cover;
+  background-size: contain;
 }
 #section-1 .content-slider .slider #top-banner-2 {
   background: url('../images/supply_chain_management_challenges_and_how_to_solve_them_with_elearning.jpg') no-repeat center center;
-  background-size: cover;
+  background-size: contain;
 }
 #section-1 .content-slider .slider #top-banner-3 {
   background: url('../images/plane-5238847.jpg') no-repeat center center;
-  background-size: cover;
+  background-size: contain;
 }
 #section-1 .content-slider .slider #top-banner-4 {
   background: url('../images/supply_chain_management_challenges_and_how_to_solve_them_with_elearning.jpg') no-repeat center center;
-  background-size: cover;
+  background-size: contain;
 }
 #section-1 .content-slider nav {
   position: absolute;
