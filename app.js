@@ -10,6 +10,7 @@ const lastname = document.querySelector(".lastname");
 const password = document.querySelector(".password");
 
 const productSection = document.querySelector(".content-wrapper");
+const profileImage = document.getElementById("profile-image");
 
 let userID = null;
 let totalPriceOfAsset = 0;
@@ -20,7 +21,9 @@ const bidAsset = "channels/mychannel/chaincodes/chaincode/asset/bid";
 const getUsersRole = "organizations/roles";
 
 const getTokenURL = HOST + "/channels/mychannel/chaincodes/chaincode/token";
+const getImage = "user/profile";
 
+const getImageUser = `${HOST}/${getImage}`;
 const inventorySidebar = document.getElementById("inventory-sidebar");
 const blockedInvenory = document.getElementById("blocked-amount");
 const usernameSidebar = document.getElementById("username-sidebar");
@@ -56,7 +59,6 @@ const roles = {
   globalDelivery: "GlobalDelivery",
   customer: "Customer",
 };
-
 
 // TODO: add alert
 
@@ -284,6 +286,23 @@ const carveOutUsername = (username) => {
   return username.split("@")[1];
 };
 
+// start get api image for userprofile
+const setProfile = () => {
+  fetch(getImageUser, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      if (data.success) {
+        profileImage.setAttribute("src", data.message[0].imageUrl);
+      }
+    });
+};
+// end get api image for userprofile
+
 const setRoleAccess = (currUser) => {
   fetch(getUsersRoleURL, {
     headers: {
@@ -297,7 +316,8 @@ const setRoleAccess = (currUser) => {
           (userRoleObj) => userRoleObj.username === currUser
         )[0];
         usernameSidebar.textContent = userRole.nickname;
-        
+        setProfile();
+
         switch (userRole.role) {
           case "Factory":
             listSection.style.display = "block";

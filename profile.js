@@ -20,7 +20,9 @@ const addToLocalDC =
   "channels/mychannel/chaincodes/chaincode/asset/localDC/add";
 const addToGlobalDC =
   "channels/mychannel/chaincodes/chaincode/asset/globalDC/add";
+const getImage = "user/profile";
 
+const getImageUser = `${HOST}/${getImage}`;
 const getUsersRoleURL = `${HOST}/${getUsersRole}`;
 const getUserHistoryURL = `${HOST}/${getUserHistory}`;
 const changeAssetStatusURL = `${HOST}/${changeStatus}`;
@@ -34,6 +36,7 @@ const token = localStorage.getItem("token");
 const addMoneyBox = document.getElementById("timeline");
 const requestContent = document.querySelector("#request-content");
 const userHistoryTable = document.getElementById("user-history-table");
+const profileImage = document.getElementById("profile-image");
 
 const inventoryAmount = document.getElementById("inventory");
 const blockedInvenory = document.getElementById("blocked-amount");
@@ -650,6 +653,23 @@ function UnSelectAll() {
   }
 }
 
+// start get api image for userprofile
+const setProfile = () => {
+  fetch(getImageUser, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      if (data.success) {
+        profileImage.setAttribute("src", data.message[0].imageUrl);
+      }
+    });
+};
+// end get api image for userprofile
+
 const setRoleAccess = (currUser) => {
   fetch(getUsersRoleURL, {
     headers: {
@@ -663,6 +683,7 @@ const setRoleAccess = (currUser) => {
           (userRoleObj) => userRoleObj.username === currUser
         )[0];
         usernameSidebar.textContent = userRole.nickname;
+        setProfile();
         // console.log(userRole.role);
 
         switch (userRole.role) {

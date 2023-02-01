@@ -22,6 +22,9 @@ const listSection = document.getElementById("list-section");
 const addMoneySection = document.getElementById("add-money-section");
 const historySection = document.getElementById("history-section");
 
+//profile image
+const profileImage = document.getElementById("profile-image");
+
 // modal
 const modalBody = document.getElementById("modal-body");
 const save = document.getElementById("save");
@@ -59,6 +62,8 @@ for (let i = 0; i < metaMaskdropdownItems.length; i++) {
 }
 
 const HOST = "http://116.203.61.236:4000";
+
+const getImage = "user/profile";
 
 const getAssetByOwner = "channels/mychannel/chaincodes/chaincode/assets/owner";
 
@@ -104,6 +109,7 @@ const takeDelivery =
 
 const getTokenURL = HOST + "/channels/mychannel/chaincodes/chaincode/token";
 
+const getImageUser = `${HOST}/${getImage}`;
 const getAssetsOwnerURL = `${HOST}/${getAssetByOwner}`;
 const setChickenForSaleURL = `${HOST}/${setChickenForSale}`;
 const getAssetsURL = `${HOST}/${getAssetsInMarket}`;
@@ -1755,6 +1761,7 @@ const carveOutUsername = (username) => {
   return username.split("@")[1];
 };
 
+// start api get token for userlogin
 const getToken = () => {
   fetch(getTokenURL, {
     method: "GET",
@@ -1773,24 +1780,26 @@ const getToken = () => {
       }
     });
 };
+// end api get token for userlogin
 
-// const getRole = () => {
-//   fetch(getUsersRoleURL, {
-//     method: "GET",
-//     headers: {
-//       Authorization: `Bearer ${token}`,
-//       "Content-Type": "application/json",
-//     },
-//   })
-//     .then((res) => res.json())
-//     .then((data) => {
-//       if (data.error !== "null") {
-//         // for all page
-//         usernameSidebar.textContent = carveOutUsername(data.message?.role);
-//       }
-//     });
-// };
+// start get api image for userprofile
+const setProfile = () => {
+  fetch(getImageUser, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      if (data.success) {
+        profileImage.setAttribute("src", data.message[0].imageUrl);
+      }
+    });
+};
+// end get api image for userprofile
 
+//start get api role for access and username
 const setRoleAccess = (currUser) => {
   fetch(getUsersRoleURL, {
     headers: {
@@ -1805,6 +1814,7 @@ const setRoleAccess = (currUser) => {
         )[0];
 
         usernameSidebar.textContent = userRole.nickname;
+        setProfile();
 
         setTheTable(userRole.role);
         switch (userRole.role) {
@@ -1862,6 +1872,7 @@ const setRoleAccess = (currUser) => {
       }
     });
 };
+//end get api role for access and username
 
 const replaceAssetsOfBatch = (data = [], batchId) => {
   batchListTable.innerHTML = "";

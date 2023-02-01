@@ -20,7 +20,9 @@ const addToLocalDC =
   "channels/mychannel/chaincodes/chaincode/asset/localDC/add";
 const addToGlobalDC =
   "channels/mychannel/chaincodes/chaincode/asset/globalDC/add";
+const getImage = "user/profile";
 
+const getImageUser = `${HOST}/${getImage}`;
 const getUsersRoleURL = `${HOST}/${getUsersRole}`;
 const getUserHistoryURL = `${HOST}/${getUserHistory}`;
 const changeAssetStatusURL = `${HOST}/${changeStatus}`;
@@ -45,6 +47,8 @@ const inventorySidebar = document.getElementById("inventory-sidebar");
 const usernameSidebar = document.getElementById("username-sidebar");
 
 const requestTable = document.getElementById("request-table");
+const profileImage = document.getElementById("profile-image");
+const profileUser = document.getElementById("profile-user");
 
 const requestTabSection = document.getElementById("request-tab-section");
 const activityTabSection = document.getElementById("activity-tab-section");
@@ -329,8 +333,6 @@ const getSelectedCustomer = async (radio_name, asset_id) => {
   }
 };
 
-
-
 function selectAll() {
   let btn = document.getElementById("batch-check-box");
   if (btn.checked) {
@@ -354,6 +356,24 @@ function UnSelectAll() {
   }
 }
 
+// start get api image for userprofile
+const setProfile = () => {
+  fetch(getImageUser, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      if (data.success) {
+        profileImage.setAttribute("src", data.message[0].imageUrl);
+        profileUser.setAttribute("src", data.message[0].imageUrl);
+      }
+    });
+};
+// end get api image for userprofile
+
 const setRoleAccess = (currUser) => {
   fetch(getUsersRoleURL, {
     headers: {
@@ -367,6 +387,7 @@ const setRoleAccess = (currUser) => {
           (userRoleObj) => userRoleObj.username === currUser
         )[0];
         usernameSidebar.textContent = userRole.nickname;
+        setProfile();
         // console.log(userRole.role);
 
         switch (userRole.role) {
@@ -381,8 +402,6 @@ const setRoleAccess = (currUser) => {
             warehouseSection.style.display = "block";
             shopSection.style.display = "block";
             requestSection.style.display = "block";
-
-
 
             // window.location.replace("./Warehouse.html");
             setRequests();
@@ -420,8 +439,6 @@ const setRoleAccess = (currUser) => {
 
           case "Customer":
             listSection.style.display = "block";
-            timelineTabSection.style.display = "block";
-            addMoneySection.style.display = "block";
             shopSection.style.display = "block";
             return;
         }

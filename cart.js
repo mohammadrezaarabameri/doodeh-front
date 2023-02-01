@@ -4,9 +4,12 @@ const HOST = "http://116.203.61.236:4000";
 const getAssetURL = HOST + "/collection/Market/objects";
 const getTokenURL = HOST + "/channels/mychannel/chaincodes/chaincode/token";
 const getUsersRole = "organizations/roles";
+const getImage = "user/profile";
 
+const getImageUser = `${HOST}/${getImage}`;
 const tableContent = document.querySelector(".table-content");
 const token = localStorage.getItem("token");
+const profileImage = document.getElementById("profile-image");
 
 const inventorySidebar = document.getElementById("inventory-sidebar");
 const blockedInvenory = document.getElementById("blocked-amount");
@@ -89,6 +92,23 @@ const carveOutUsername = (username1) => {
   }
 };
 
+// start get api image for userprofile
+const setProfile = () => {
+  fetch(getImageUser, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      if (data.success) {
+        profileImage.setAttribute("src", data.message[0].imageUrl);
+      }
+    });
+};
+// end get api image for userprofile
+
 const setRoleAccess = (currUser) => {
   fetch(getUsersRoleURL, {
     headers: {
@@ -103,7 +123,7 @@ const setRoleAccess = (currUser) => {
         )[0];
 
         usernameSidebar.textContent = userRole.nickname;
-
+        setProfile();
         switch (userRole.role) {
           case "Factory":
             listSection.style.display = "block";

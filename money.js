@@ -20,7 +20,9 @@ const addToLocalDC =
   "channels/mychannel/chaincodes/chaincode/asset/localDC/add";
 const addToGlobalDC =
   "channels/mychannel/chaincodes/chaincode/asset/globalDC/add";
+const getImage = "user/profile";
 
+const getImageUser = `${HOST}/${getImage}`;
 const getUsersRoleURL = `${HOST}/${getUsersRole}`;
 const getUserHistoryURL = `${HOST}/${getUserHistory}`;
 const changeAssetStatusURL = `${HOST}/${changeStatus}`;
@@ -46,6 +48,7 @@ const usernameSidebar = document.getElementById("username-sidebar");
 const timelineTabSection = document.getElementById("timeline-tab-section");
 
 const activityTabPanelSection = document.getElementById("activity");
+const profileImage = document.getElementById("profile-image");
 
 // sidebar buttons
 const productionSection = document.getElementById("production-section");
@@ -423,8 +426,22 @@ const acceptGDReq = (acceptBtnId, idx) => {
       }
     });
 };
-
-// get local delivert req
+// start get api image for userprofile
+const setProfile = () => {
+  fetch(getImageUser, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      if (data.success) {
+        profileImage.setAttribute("src", data.message[0].imageUrl);
+      }
+    });
+};
+// end get api image for userprofile
 
 const setRoleAccess = (currUser) => {
   fetch(getUsersRoleURL, {
@@ -439,6 +456,7 @@ const setRoleAccess = (currUser) => {
           (userRoleObj) => userRoleObj.username === currUser
         )[0];
         usernameSidebar.textContent = userRole.nickname;
+        setProfile();
         // console.log(userRole.role);
 
         switch (userRole.role) {

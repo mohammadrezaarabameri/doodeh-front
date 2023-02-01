@@ -1,6 +1,7 @@
 const HOST = "http://116.203.61.236:4000";
 
 const getAssetsByOwner = "channels/mychannel/chaincodes/chaincode/assets/owner";
+const getImage = "user/profile";
 
 const getChickenHistory =
   "channels/mychannel/chaincodes/chaincode/asset/history";
@@ -13,6 +14,7 @@ const setChickenForSale =
 const changeStatus =
   "channels/mychannel/chaincodes/chaincode/asset/status/change";
 
+const getImageUser = `${HOST}/${getImage}`;
 const getAssetsURL = `${HOST}/${getAssetsByOwner}`;
 const getChickenHistoryURL = `${HOST}/${getChickenHistory}`;
 const getTokenURL = `${HOST}/${getTokenEndpoint}`;
@@ -29,6 +31,8 @@ const modalBody = document.getElementById("modal-body");
 const modalTitle = document.getElementsByClassName("modal-title")[0];
 const save = document.getElementById("save");
 const card = document.getElementsByClassName("content")[0];
+
+const profileImage = document.getElementById("profile-image");
 
 // meta mask
 const metaMaskSection = document.getElementById("connect-metamask-section");
@@ -575,6 +579,23 @@ const carveOutPrice = (data = [], key) => {
   return filteredData[0].price;
 };
 
+// start get api image for userprofile
+const setProfile = () => {
+  fetch(getImageUser, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      if (data.success) {
+        profileImage.setAttribute("src", data.message[0].imageUrl);
+      }
+    });
+};
+// end get api image for userprofile
+
 const setRoleAccess = (currUser) => {
   fetch(getUsersRoleURL, {
     headers: {
@@ -588,6 +609,7 @@ const setRoleAccess = (currUser) => {
           (userRoleObj) => userRoleObj.username === currUser
         )[0];
         usernameSidebar.textContent = userRole.nickname;
+        setProfile();
         username = currUser;
         switch (userRole.role) {
           case "Factory":
