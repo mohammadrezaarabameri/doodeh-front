@@ -24,6 +24,9 @@ const inventoryAmount = document.getElementById("inventory");
 const blockedInvenory = document.getElementById("blocked-amount");
 const profileCard = document.getElementById("profile-card");
 
+const productSection = document.querySelector(".content-wrapper");
+const profileImage = document.getElementById("profile-image");
+
 const inventorySidebar = document.getElementById("inventory-sidebar");
 const usernameSidebar = document.getElementById("username-sidebar");
 
@@ -44,6 +47,7 @@ const listSection = document.getElementById("list-section");
 const addMoneySection = document.getElementById("add-money-section");
 const historySection = document.getElementById("history-section");
 
+const getImage = "user/profile";
 const addChicken = "channels/mychannel/chaincodes/chaincode/chicken/create";
 const addBulkChicken =
   "channels/mychannel/chaincodes/chaincode/asset/create/bulk";
@@ -60,6 +64,7 @@ const addEmptyBatch = "channels/mychannel/chaincodes/chaincode/batch/create";
 
 const getUsersRole = "organizations";
 
+const getImageUser = `${HOST}/${getImage}`;
 const addMoneyURL = `${HOST}/${addMoney}`;
 const getTokenURL = `${HOST}/${getTokenEndpoint}`;
 const getBidsForAssetURL = `${HOST}/${getBidsForAsset}`;
@@ -86,10 +91,10 @@ const baseValueForEmptyBatch = 0;
 let str =
   "Successfully added the chicken asset with key 26e6d7df-424e-406a-9e41-6898d265af22";
 
-let username = null;
-const carveOutUsername = (username) => {
-  return username.split("@")[1];
-};
+// let username = null;
+// const carveOutUsername = (username) => {
+//   return username.split("@")[1];
+// };
 
 const getToken = () => {
   fetch(getTokenURL, {
@@ -101,6 +106,7 @@ const getToken = () => {
   })
     .then((res) => res.json())
     .then((data) => {
+      console.log(data);
       if (data.error !== "null") {
         // for all page
         inventorySidebar.textContent = data.result?.amount;
@@ -110,7 +116,6 @@ const getToken = () => {
       }
     });
 };
-
 window.addEventListener("load", async () => {
   getToken();
   // set count input field to 0 and disbale it
@@ -293,6 +298,23 @@ addBatchBtn.addEventListener("click", (e) => {
   }
 });
 
+// start get api image for userprofile
+const setProfile = () => {
+  fetch(getImageUser, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      if (data.success) {
+        profileImage.setAttribute("src", data.message[0].imageUrl);
+      }
+    });
+};
+// end get api image for userprofile
+
 const setRoleAccess = (currUser) => {
   fetch(getUsersRoleURL, {
     headers: {
@@ -301,12 +323,14 @@ const setRoleAccess = (currUser) => {
   })
     .then((res) => res.json())
     .then((data) => {
+      console.log(data);
       if (data.success) {
         let userRole = data.message.filter(
           (userRoleObj) => userRoleObj.username === currUser
         )[0];
 
         usernameSidebar.textContent = userRole.nickname;
+        setProfile();
         switch (userRole.role) {
           case "Factory":
             listSection.style.display = "block";
@@ -338,3 +362,4 @@ const setRoleAccess = (currUser) => {
       }
     });
 };
+
