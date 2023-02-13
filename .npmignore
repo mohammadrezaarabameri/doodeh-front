@@ -1,7 +1,1 @@
-docs/
-docs_html/
-plugins/
-!/plugins/flot-old/
-.github/
-.lgtm.yml/
-build/
+/build
