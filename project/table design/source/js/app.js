@@ -476,6 +476,8 @@ const changeStatusColorOnServer = (assetId, selectedVal, assetType = "") => {
     status: selectedVal,
   };
 
+  console.log(assetType);
+
   fetch(changeAssetStatusURL, {
     method: "POST",
     body: JSON.stringify(statusData),
@@ -486,6 +488,38 @@ const changeStatusColorOnServer = (assetId, selectedVal, assetType = "") => {
   })
     .then((res) => res.json())
     .then((data) => {
+      console.log(data)
+      
+      /* todo: bug fix required */
+      // if (assetType.toLowerCase() === "buyer") {
+      //   console.log("buyer executed");
+
+      //   let assetObj = assetDataBuyer.find((obj) => obj.id === assetId);
+      //   assetObj.owner = assetObj.buyer;
+      //   let assetIndex = assetDataBuyer.findIndex((obj) => obj.id === assetId);
+
+      //   assetObj.status = paid.name;
+      //   assetObj.statusColor = paid.color;
+      //   assetDataOwnedBuyer.push(assetObj);
+
+      //   confirmBuyerBtn.remove();
+
+      //   assetDataBuyer.splice(assetIndex, 1);
+      //   setTableRowsForBuyerAsset(assetDataBuyer);
+      //   setTheTableForConfirmedBuy(assetDataOwnedBuyer);
+
+      //   card.insertAdjacentHTML(
+      //     "beforebegin",
+      //     `
+      //   <div class="alert alert-success" role="alert" id='alert-2'>
+      //           Asset confirmed to be received;
+      //   </div>
+      //   `
+      //   );
+      //   let alert2 = document.getElementById("alert-2");
+      //   setTimeout(() => alert2.remove(), 3000);
+      // }
+
       if (
         selectedVal === warehouse.name &&
         assetType.toLowerCase() === "batch"
@@ -496,30 +530,6 @@ const changeStatusColorOnServer = (assetId, selectedVal, assetType = "") => {
         assetType.toLowerCase() === "chicken"
       ) {
         changeAssetOwner(assetId, retailerWarehouseOwner);
-      } else if (assetType.toLowerCase() === "buyer") {
-        let assetObj = assetDataBuyer.find((obj) => obj.id === assetId);
-        assetObj.owner = assetObj.buyer;
-        let assetIndex = assetDataBuyer.findIndex((obj) => obj.id === assetId);
-        assetObj.status = paid.name;
-        assetObj.statusColor = paid.color;
-        assetDataOwnedBuyer.push(assetObj);
-
-        confirmBuyerBtn.remove();
-
-        assetDataBuyer.splice(assetIndex, 1);
-        setTableRowsForBuyerAsset(assetDataBuyer);
-        setTheTableForConfirmedBuy(assetDataOwnedBuyer);
-
-        card.insertAdjacentHTML(
-          "beforebegin",
-          `
-        <div class="alert alert-success" role="alert" id='alert-2'>
-                Asset confirmed to be received; 
-        </div>
-        `
-        );
-        let alert2 = document.getElementById("alert-2");
-        setTimeout(() => alert2.remove(), 3000);
       } else if (assetType == "delivery") {
         if ($("#modal-default").hasClass("show")) {
           $("#modal-default").modal("toggle");
@@ -2105,8 +2115,8 @@ batchIds.addEventListener("change", (e) => {
 });
 
 let assetDataStatus = null;
-let assetDataBuyer = null;
-let assetDataOwnedBuyer = null;
+let assetDataBuyer = [];
+let assetDataOwnedBuyer = [];
 let confirmBuyerBtn = null;
 let assetDataDeliveryStatusForCompanies = null;
 
@@ -2245,7 +2255,7 @@ const confirmReceived = (idx) => {
   //     </div>
   //   </div>
   // `;
-
+  console.log("start take delivey");
   const data = {
     id: idx,
   };
@@ -2258,8 +2268,12 @@ const confirmReceived = (idx) => {
     },
     body: JSON.stringify(data),
   })
-    .then((res) => res.json())
+    .then((res) => {
+      res.json();
+      console.log("json");
+    })
     .then((data) => {
+      console.log("ready to change status");
       changeStatusColorOnServer(idx, paid.name, "buyer");
     });
 };
@@ -2500,7 +2514,7 @@ metaMaskBtn.addEventListener("click", (e) => {
       });
   });
   metaMaskBtn.setAttribute("disabled", true);
-  metaMaskBtn.textContent = "connected";
+  metaMaskBtn.textContent = "Connected";
 });
 
 // todo: const transferToken(value, idx, recvBtnId, to) -> pass to dynamically
@@ -2517,7 +2531,8 @@ const transferToken = (value, idx, recvBtnId) => {
   console.log(value);
   value = Number(value);
   value = value * Math.pow(10, 18);
-  value = value.toString(16);
+  value = value.toString(16); // to hex
+
   let transactionParam = {
     to: to,
     from: account,
@@ -2544,6 +2559,25 @@ const transferToken = (value, idx, recvBtnId) => {
       checkTransactionconfirmation(txhash).then((r) => {
         console.log(r);
         if (r == "confirmed") {
+          
+          // buyer section in changeStatusColorOnServer func -> todo: temp solution for the bug
+          let assetObj = assetDataBuyer.find((obj) => obj.id === idx); // idx = assetId, assetDataBuyer -> Receipt list
+          assetObj.owner = assetObj.buyer;
+          let assetIndex = assetDataBuyer.findIndex((obj) => obj.id === idx);
+
+          assetObj.status = paid.name;
+          assetObj.statusColor = paid.color; 
+          assetDataOwnedBuyer.push(assetObj); // assetDataOwnedBuyer -> paids list
+
+          confirmBuyerBtn.remove();
+
+          assetDataBuyer.splice(assetIndex, 1);
+          setTableRowsForBuyerAsset(assetDataBuyer); // -> Receipts table reset
+          setTheTableForConfirmedBuy(assetDataOwnedBuyer); // -> Paids table reset
+          //
+          
+          confirmReceived(idx);
+
           card.insertAdjacentHTML(
             "beforebegin",
             `
@@ -2554,8 +2588,6 @@ const transferToken = (value, idx, recvBtnId) => {
           );
           let alert2 = document.getElementById("alert-2");
           setTimeout(() => alert2.remove(), 3000);
-
-          confirmReceived(idx);
         } else {
           card.insertAdjacentHTML(
             "beforebegin",
